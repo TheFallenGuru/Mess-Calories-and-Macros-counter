@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Mess Menu Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .feedback-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .feedback-btn:hover::before {
+            left: 100%;
+        }
+
+        .feedback-btn:hover {
+            box-shadow: 0 20px 40px rgba(236, 72, 153, 0.4);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glow-on-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .glow-on-hover:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.8); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, #80ff00, #fffb00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .meal-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .meal-card:hover {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+            transform: translateY(-2px);
+        }
+        
+        .item-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .item-card:hover::before {
+            left: 100%;
+        }
+        
+        .selected-item {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(147, 51, 234, 0.2));
+            border: 2px solid rgba(99, 102, 241, 0.5);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .neon-border {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+            border: 2px solid rgba(99, 102, 241, 0.8);
+        }
+        
+        .calorie-card {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .protein-card {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+        
+        .carbs-card {
+            background: linear-gradient(135deg, #45b7d1, #096dd9);
+        }
+        
+        .fat-card {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        
+        .weekday-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .weekday-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .weekday-btn:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .slide-in-up {
+            animation: slideInUp 0.8s ease-out;
+        }
+        
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 text-white">
+    <!-- Floating background elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 floating"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 floating" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-20 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 floating" style="animation-delay: 4s;"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-8 bounce-in">
+            <div class="inline-flex items-center justify-center mb-4 p-4 glass-morphism rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-300 mr-3">
+                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+                    <path d="M7 2v20"/>
+                    <path d="M21 15V2c0-1.1-.9-2-2-2h-4a2 2 0 0 0-2 2v13"/>
+                    <path d="M15 15v7"/>
+                </svg>
+                <h1 class="text-4xl md:text-6xl font-black gradient-text tracking-tight">
+                    Daily Mess Menu
+                </h1>
+            </div>
+            <p class="text-xl text-gray-200 font-light">Track your nutritious journey with this simple and basic Website✨</p>
+        </div>
+
+        <!-- Weekday selector -->
+        <div id="weekday-selector" class="flex flex-wrap justify-center gap-3 mb-8 p-6 glass-morphism rounded-3xl slide-in-up">
+            <!-- Weekday buttons will be dynamically added here -->
+        </div>
+
+        <!-- Daily Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 slide-in-up">
+            <div class="calorie-card text-white rounded-3xl p-6 shadow-2xl glow-on-hover pulse-glow">
+                <div class="flex items-center mb-2">
+                    <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                    <p class="text-lg font-bold">Total Calories</p>
+                </div>
+                <p id="total-calories" class="text-4xl font-black">0</p>
+                <p class="text-sm opacity-80">kcal</p>
+            </div>
+            
+            <div class="protein-card text-white rounded-3xl p-6 shadow-2xl glow-on-hover">
+                <div class="flex items-center mb-2">
+                    <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="text-lg font-bold">Protein</p>
+                </div>
+                <p id="total-protein" class="text-4xl font-black">0g</p>
+                <p class="text-sm opacity-80">muscle fuel</p>
+            </div>
+            
+            <div class="carbs-card text-white rounded-3xl p-6 shadow-2xl glow-on-hover">
+                <div class="flex items-center mb-2">
+                    <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                    </svg>
+                    <p class="text-lg font-bold">Carbs</p>
+                </div>
+                <p id="total-carbs" class="text-4xl font-black">0g</p>
+                <p class="text-sm opacity-80">energy source</p>
+            </div>
+            
+            <div class="fat-card text-white rounded-3xl p-6 shadow-2xl glow-on-hover">
+                <div class="flex items-center mb-2">
+                    <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                    </svg>
+                    <p class="text-lg font-bold">Fat</p>
+                </div>
+                <p id="total-fat" class="text-4xl font-black">0g</p>
+                <p class="text-sm opacity-80">essential</p>
+            </div>
+        </div>
+
+        <div id="meal-sections-container" class="space-y-8">
+        </div>
+        <div class="mt-12 text-center">
+            <div class="glass-morphism rounded-3xl p-8 shadow-2xl bounce-in">
+                <div class="flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-300 mr-3">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <h3 class="text-2xl font-bold text-white">Love this Website? Have suggestions?</h3>
+                </div>
+                <p class="text-gray-200 mb-6">Your feedback helps make this better for everyone! 💫</p>
+                <p class="text-gray-200 mb-6">Note:The Values may not be accurate</p>
+                <p class="text-gray-200 mb-6">My mail: architkolte@gmail.com <br> OR
+                </p>
+                <a href="mailto:architkolte@gmail.com?subject=Mess Menu Tracker Feedback&body=Hi! I have some feedback about the Mess Menu Tracker app:" 
+                class="feedback-btn inline-flex items-center px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 glow-on-hover">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0 1.1.9 2 2 2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Send Feedback ✉️
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messMenu = {
+          'Monday': {
+            'Breakfast': [
+              { id: '1', name: 'Idli', portion: '1 pc', calories: 50, protein: 2, carbs: 10, fat: 1 },
+              { id: '2', name: 'Vada', portion: '1 pc', calories: 135, protein: 5, carbs: 18, fat: 8 },
+              { id: '3', name: 'Sambar', portion: '1 bowl (150g)', calories: 140, protein: 5, carbs: 18, fat: 5 },
+              { id: '4', name: 'Peanut Chutney', portion: '1 serving (30g)', calories: 80, protein: 3, carbs: 5, fat: 6 },
+              { id: '5', name: 'Mix Fruit', portion: '1 bowl (100g)', calories: 100, protein: 1, carbs: 25, fat: 1 },
+              { id: '6', name: 'Bread, Butter, Jam', portion: '2 slices', calories: 220, protein: 5, carbs: 30, fat: 10 },
+              { id: '7', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+              { id: '8', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '9', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+            ],
+            'Lunch': [
+              { id: '10', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '11', name: 'Plain Dal', portion: '1 bowl (150g)', calories: 200, protein: 10, carbs: 30, fat: 5 },
+              { id: '12', name: 'Jeera Rice', portion: '1 cup (150g)', calories: 250, protein: 5, carbs: 50, fat: 4 },
+              { id: '13', name: 'Kadi Pakoda', portion: '1 serving (150g)', calories: 200, protein: 6, carbs: 20, fat: 10 },
+              { id: '14', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '15', name: 'Kara Kollumbu', portion: '1 bowl (150g)', calories: 120, protein: 3, carbs: 15, fat: 6 },
+              { id: '16', name: 'Plain Buttermilk', portion: '1 glass (200ml)', calories: 50, protein: 4, carbs: 6, fat: 2 },
+              { id: '17', name: 'Rasam', portion: '1 bowl (150g)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '18', name: 'Frymus', portion: '1 small serving (30g)', calories: 80, protein: 1, carbs: 15, fat: 2 },
+            ],
+            'Snacks': [
+              { id: '19', name: 'Kachori', portion: '1 pc (50g)', calories: 250, protein: 5, carbs: 30, fat: 12 },
+              { id: '20', name: 'Noodles', portion: '1 bowl (200g)', calories: 350, protein: 8, carbs: 50, fat: 15 },
+              { id: '21', name: 'Sauce', portion: '1 sachet (10g)', calories: 20, protein: 0, carbs: 5, fat: 0 },
+              { id: '22', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '23', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '24', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+            ],
+            'Dinner': [
+              { id: '25', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '26', name: 'Aloo White Peas Masala', portion: '1 bowl (150g)', calories: 250, protein: 6, carbs: 30, fat: 10 },
+              { id: '27', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '28', name: 'Dal Fry', portion: '1 bowl (150g)', calories: 245, protein: 13, carbs: 33, fat: 7 },
+              { id: '29', name: 'Egg Masala', portion: '1 bowl (150g)', calories: 207, protein: 7, carbs: 4, fat: 18 },
+              { id: '30', name: 'Sambhar', portion: '1 bowl (150g)', calories: 140, protein: 5, carbs: 18, fat: 5 },
+              { id: '31', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+            ],
+          },
+          'Tuesday': {
+            'Breakfast': [
+              { id: '32', name: 'Poori', portion: '1 pc', calories: 180, protein: 4, carbs: 20, fat: 10 },
+              { id: '33', name: 'Paratha', portion: '1 pc', calories: 250, protein: 5, carbs: 30, fat: 12 },
+              { id: '34', name: 'Bhaiji / Aloo Matar Masala', portion: '1 bowl (150g)', calories: 200, protein: 5, carbs: 30, fat: 8 },
+              { id: '35', name: 'Chutney', portion: '1 serving (30g)', calories: 80, protein: 2, carbs: 8, fat: 5 },
+              { id: '36', name: 'Mix Fruit', portion: '1 bowl (100g)', calories: 100, protein: 1, carbs: 25, fat: 1 },
+              { id: '37', name: 'Bread, Butter, Jam', portion: '2 slices', calories: 220, protein: 5, carbs: 30, fat: 10 },
+              { id: '38', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+              { id: '39', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '40', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '41', name: 'Boiled Egg', portion: '1 egg (50g)', calories: 80, protein: 7, carbs: 1, fat: 6 },
+              { id: '42', name: 'Sprouts', portion: '1 bowl (100g)', calories: 100, protein: 8, carbs: 20, fat: 2 },
+            ],
+            'Lunch': [
+              { id: '43', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '44', name: 'Rajma', portion: '1 bowl (150g)', calories: 250, protein: 15, carbs: 40, fat: 5 },
+              { id: '45', name: 'Ghee Rice', portion: '1 cup (150g)', calories: 300, protein: 6, carbs: 55, fat: 6 },
+              { id: '46', name: 'Dal Tadka', portion: '1 bowl (150g)', calories: 200, protein: 10, carbs: 30, fat: 5 },
+              { id: '47', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '48', name: 'Sambhar', portion: '1 bowl (150g)', calories: 140, protein: 5, carbs: 18, fat: 5 },
+              { id: '49', name: 'Greens Kottu', portion: '1 bowl (150g)', calories: 120, protein: 4, carbs: 20, fat: 4 },
+              { id: '50', name: 'Jeera Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '51', name: 'Salad', portion: '1 bowl (100g)', calories: 50, protein: 2, carbs: 10, fat: 1 },
+              { id: '52', name: 'Curd', portion: '1 bowl (100g)', calories: 100, protein: 5, carbs: 8, fat: 5 },
+            ],
+            'Snacks': [
+              { id: '53', name: 'Burger', portion: '1 pc (150g)', calories: 400, protein: 15, carbs: 40, fat: 20 },
+              { id: '54', name: 'Sauce', portion: '1 sachet (10g)', calories: 20, protein: 0, carbs: 5, fat: 0 },
+              { id: '55', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '56', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '57', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+            ],
+            'Dinner': [
+              { id: '58', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '59', name: 'Dal Fry', portion: '1 bowl (150g)', calories: 245, protein: 13, carbs: 33, fat: 7 },
+              { id: '60', name: 'Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '61', name: 'Dry Aloo Soya', portion: '1 bowl (150g)', calories: 250, protein: 10, carbs: 30, fat: 10 },
+              { id: '62', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '63', name: 'Rasam', portion: '1 bowl (150g)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '64', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+              { id: '65', name: 'Fruit Custard / Payasam', portion: '1 bowl (150g)', calories: 280, protein: 5, carbs: 45, fat: 8 },
+            ],
+          },
+          'Wednesday': {
+            'Breakfast': [
+              { id: '67', name: 'Onion Veg Uttapam', portion: '1 pc (100g)', calories: 200, protein: 5, carbs: 35, fat: 5 },
+              { id: '68', name: 'Sambar', portion: '1 bowl (150g)', calories: 140, protein: 5, carbs: 18, fat: 5 },
+              { id: '69', name: 'Tomato Chutney', portion: '1 serving (30g)', calories: 70, protein: 2, carbs: 10, fat: 3 },
+              { id: '70', name: 'Mix Fruit', portion: '1 bowl (100g)', calories: 100, protein: 1, carbs: 25, fat: 1 },
+              { id: '71', name: 'Bread, Butter, Jam', portion: '2 slices', calories: 220, protein: 5, carbs: 30, fat: 10 },
+              { id: '72', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+              { id: '73', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '74', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '75', name: 'Boiled Egg', portion: '1 egg (50g)', calories: 80, protein: 7, carbs: 1, fat: 6 },
+              { id: '76', name: 'Sprouts', portion: '1 bowl (100g)', calories: 100, protein: 8, carbs: 20, fat: 2 },
+            ],
+            'Lunch': [
+              { id: '77', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '78', name: 'Jeera Aloo', portion: '1 bowl (150g)', calories: 200, protein: 4, carbs: 30, fat: 8 },
+              { id: '79', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '80', name: 'Dal Makhani', portion: '1 bowl (150g)', calories: 350, protein: 18, carbs: 40, fat: 15 },
+              { id: '81', name: 'Puli Kolumbu', portion: '1 bowl (150g)', calories: 120, protein: 3, carbs: 15, fat: 6 },
+              { id: '82', name: 'Avial', portion: '1 bowl (150g)', calories: 150, protein: 5, carbs: 20, fat: 8 },
+              { id: '83', name: 'Garlic Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '84', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+              { id: '85', name: 'Boondi', portion: '1 serving (30g)', calories: 150, protein: 5, carbs: 15, fat: 8 },
+              { id: '86', name: 'Veg Raita', portion: '1 bowl (100g)', calories: 100, protein: 4, carbs: 8, fat: 5 },
+            ],
+            'Snacks': [
+              { id: '87', name: 'Samosa', portion: '1 pc (50g)', calories: 250, protein: 5, carbs: 30, fat: 12 },
+              { id: '88', name: 'Green Chutni & Red Chutni', portion: '1 serving (30g)', calories: 30, protein: 1, carbs: 5, fat: 1 },
+              { id: '89', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '90', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '91', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+            ],
+            'Dinner': [
+              { id: '92', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '93', name: 'Plain Dal', portion: '1 bowl (150g)', calories: 200, protein: 10, carbs: 30, fat: 5 },
+              { id: '94', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '95', name: 'Kadai Chicken', portion: '1 bowl (150g)', calories: 350, protein: 30, carbs: 10, fat: 20 },
+              { id: '96', name: 'Chicken Masala', portion: '1 bowl (150g)', calories: 350, protein: 30, carbs: 10, fat: 20 },
+              { id: '97', name: 'Butter Paneer', portion: '1 bowl (150g)', calories: 300, protein: 15, carbs: 15, fat: 20 },
+              { id: '98', name: 'Rasam', portion: '1 bowl (150g)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '99', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+            ],
+          },
+          'Thursday': {
+            'Breakfast': [
+              { id: '100', name: 'Poha', portion: '1 bowl (150g)', calories: 200, protein: 5, carbs: 35, fat: 5 },
+              { id: '101', name: 'Jalebi', portion: '1 pc (50g)', calories: 250, protein: 2, carbs: 45, fat: 8 },
+              { id: '102', name: 'Pongal', portion: '1 bowl (150g)', calories: 300, protein: 8, carbs: 40, fat: 12 },
+              { id: '103', name: 'Sambhar', portion: '1 bowl (150g)', calories: 140, protein: 5, carbs: 18, fat: 5 },
+              { id: '104', name: 'Chutney', portion: '1 serving (30g)', calories: 80, protein: 2, carbs: 8, fat: 5 },
+              { id: '105', name: 'Fruit', portion: '1 bowl (100g)', calories: 100, protein: 1, carbs: 25, fat: 1 },
+              { id: '106', name: 'Bread, Butter, Jam', portion: '2 slices', calories: 220, protein: 5, carbs: 30, fat: 10 },
+              { id: '107', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+              { id: '108', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '109', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+            ],
+            'Lunch': [
+              { id: '110', name: 'Poori', portion: '1 pc', calories: 180, protein: 4, carbs: 20, fat: 10 },
+              { id: '111', name: 'Pindi Chole Masala', portion: '1 bowl (150g)', calories: 290, protein: 10, carbs: 35, fat: 12 },
+              { id: '112', name: 'Jeera Rice', portion: '1 cup (150g)', calories: 250, protein: 5, carbs: 50, fat: 4 },
+              { id: '113', name: 'Seasonal Veg', portion: '1 bowl (150g)', calories: 150, protein: 4, carbs: 20, fat: 8 },
+              { id: '114', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '115', name: 'Pakoda Kolumbu', portion: '1 bowl (150g)', calories: 200, protein: 6, carbs: 20, fat: 10 },
+              { id: '116', name: 'Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '117', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+              { id: '118', name: 'Potato Poriyal', portion: '1 bowl (150g)', calories: 220, protein: 4, carbs: 30, fat: 10 },
+              { id: '119', name: 'Salad', portion: '1 bowl (100g)', calories: 50, protein: 2, carbs: 10, fat: 1 },
+            ],
+            'Snacks': [
+              { id: '120', name: 'Veg Cutlet', portion: '1 pc (50g)', calories: 180, protein: 5, carbs: 20, fat: 10 },
+              { id: '121', name: 'Veg Chutney', portion: '1 serving (30g)', calories: 30, protein: 1, carbs: 5, fat: 1 },
+              { id: '122', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '123', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '124', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+            ],
+            'Dinner': [
+              { id: '125', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '126', name: 'Aloo Tomato Jhol', portion: '1 bowl (150g)', calories: 200, protein: 5, carbs: 25, fat: 8 },
+              { id: '127', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '128', name: 'Egg Curry', portion: '1 bowl (150g)', calories: 280, protein: 15, carbs: 10, fat: 20 },
+              { id: '129', name: 'Dal Fry', portion: '1 bowl (150g)', calories: 245, protein: 13, carbs: 33, fat: 7 },
+              { id: '130', name: 'Rasam', portion: '1 bowl (150g)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '131', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+            ],
+          },
+          'Friday': {
+            'Breakfast': [
+              { id: '132', name: 'Bhature', portion: '1 pc', calories: 350, protein: 8, carbs: 40, fat: 15 },
+              { id: '133', name: 'Chole Masala', portion: '1 bowl (150g)', calories: 290, protein: 10, carbs: 35, fat: 12 },
+              { id: '134', name: 'Fruit', portion: '1 bowl (100g)', calories: 100, protein: 1, carbs: 25, fat: 1 },
+              { id: '135', name: 'Bread, Butter, Jam', portion: '2 slices', calories: 220, protein: 5, carbs: 30, fat: 10 },
+              { id: '136', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+              { id: '137', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '138', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+            ],
+            'Lunch': [
+              { id: '139', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '140', name: 'Masoor Dal', portion: '1 bowl (150g)', calories: 180, protein: 10, carbs: 25, fat: 4 },
+              { id: '141', name: 'Kadhai Chana', portion: '1 bowl (150g)', calories: 250, protein: 12, carbs: 30, fat: 8 },
+              { id: '142', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '143', name: 'Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '144', name: 'Sambhar Rice', portion: '1 bowl (200g)', calories: 280, protein: 8, carbs: 45, fat: 6 },
+              { id: '145', name: 'Raw Banana Porial', portion: '1 bowl (100g)', calories: 150, protein: 4, carbs: 25, fat: 5 },
+              { id: '146', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+              { id: '147', name: 'Butter Milk', portion: '1 glass (200ml)', calories: 50, protein: 4, carbs: 6, fat: 2 },
+            ],
+            'Snacks': [
+              { id: '148', name: 'Dal Vada', portion: '1 pc (50g)', calories: 180, protein: 7, carbs: 18, fat: 8 },
+              { id: '149', name: 'Vada Pav', portion: '1 pc (100g)', calories: 320, protein: 12, carbs: 40, fat: 12 },
+              { id: '150', name: 'Coconut Chutney', portion: '1 serving (30g)', calories: 50, protein: 2, carbs: 5, fat: 4 },
+              { id: '151', name: 'Green Chutney', portion: '1 serving (30g)', calories: 30, protein: 1, carbs: 5, fat: 1 },
+              { id: '152', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '153', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '154', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+            ],
+            'Dinner': [
+              { id: '155', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '156', name: 'Matar Paneer Bhurji', portion: '1 bowl (150g)', calories: 280, protein: 15, carbs: 15, fat: 18 },
+              { id: '157', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '158', name: 'Butter Chicken', portion: '1 bowl (150g)', calories: 400, protein: 35, carbs: 10, fat: 25 },
+              { id: '159', name: 'Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '160', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+            ],
+          },
+          'Saturday': {
+            'Breakfast': [
+              { id: '161', name: 'Rava Upma', portion: '1 bowl (150g)', calories: 220, protein: 5, carbs: 35, fat: 5 },
+              { id: '162', name: 'Messal Pav', portion: '1 pc', calories: 280, protein: 5, carbs: 35, fat: 12 },
+              { id: '163', name: 'Chutney', portion: '1 serving (30g)', calories: 80, protein: 2, carbs: 8, fat: 5 },
+              { id: '164', name: 'Fruit', portion: '1 bowl (100g)', calories: 100, protein: 1, carbs: 25, fat: 1 },
+              { id: '165', name: 'Bread, Butter, Jam', portion: '2 slices', calories: 220, protein: 5, carbs: 30, fat: 10 },
+              { id: '166', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+              { id: '167', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '168', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '169', name: 'Boiled Egg', portion: '1 egg (50g)', calories: 80, protein: 7, carbs: 1, fat: 6 },
+              { id: '170', name: 'Sprouts', portion: '1 bowl (100g)', calories: 100, protein: 8, carbs: 20, fat: 2 },
+            ],
+            'Lunch': [
+              { id: '171', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '172', name: 'Veg Kofta', portion: '1 bowl (150g)', calories: 280, protein: 8, carbs: 30, fat: 15 },
+              { id: '173', name: 'Veg Pulao', portion: '1 cup (150g)', calories: 294, protein: 7, carbs: 47, fat: 6 },
+              { id: '174', name: 'Tomato Dal', portion: '1 bowl (150g)', calories: 180, protein: 10, carbs: 25, fat: 4 },
+              { id: '175', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '176', name: 'Sambhar', portion: '1 bowl (150g)', calories: 140, protein: 5, carbs: 18, fat: 5 },
+              { id: '177', name: 'Beetroot Porial', portion: '1 bowl (100g)', calories: 100, protein: 3, carbs: 15, fat: 4 },
+              { id: '178', name: 'Drumstick Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '179', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+              { id: '180', name: 'Frymus', portion: '1 small serving (30g)', calories: 80, protein: 1, carbs: 15, fat: 2 },
+              { id: '181', name: 'Curd', portion: '1 bowl (100g)', calories: 100, protein: 5, carbs: 8, fat: 5 },
+            ],
+            'Snacks': [
+              { id: '182', name: 'Bhaji Puri', portion: '1 pc (50g)', calories: 250, protein: 5, carbs: 30, fat: 12 },
+              { id: '183', name: 'Bread Pakoda', portion: '1 pc (50g)', calories: 200, protein: 4, carbs: 25, fat: 10 },
+              { id: '184', name: 'Sauce', portion: '1 sachet (10g)', calories: 20, protein: 0, carbs: 5, fat: 0 },
+              { id: '185', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '186', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '187', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+            ],
+            'Dinner': [
+              { id: '188', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '189', name: 'Fried Rice', portion: '1 bowl (200g)', calories: 350, protein: 8, carbs: 50, fat: 12 },
+              { id: '190', name: 'Masala Dal', portion: '1 bowl (150g)', calories: 200, protein: 10, carbs: 30, fat: 5 },
+              { id: '191', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '192', name: 'Veg Manchurian', portion: '1 serving (150g)', calories: 280, protein: 6, carbs: 35, fat: 12 },
+              { id: '193', name: 'Aloo Bhindi', portion: '1 bowl (150g)', calories: 220, protein: 5, carbs: 25, fat: 10 },
+              { id: '194', name: 'Rasam', portion: '1 bowl (150g)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '195', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+            ],
+          },
+          'Sunday': {
+            'Breakfast': [
+              { id: '196', name: 'Masala Dosa', portion: '1 pc', calories: 230, protein: 4, carbs: 27, fat: 12 },
+              { id: '197', name: 'Sambar', portion: '1 bowl (150g)', calories: 140, protein: 5, carbs: 18, fat: 5 },
+              { id: '198', name: 'Chutney', portion: '1 serving (30g)', calories: 80, protein: 2, carbs: 8, fat: 5 },
+              { id: '199', name: 'Fruit', portion: '1 bowl (100g)', calories: 100, protein: 1, carbs: 25, fat: 1 },
+              { id: '200', name: 'Bread, Butter, Jam', portion: '2 slices', calories: 220, protein: 5, carbs: 30, fat: 10 },
+              { id: '201', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+              { id: '202', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '203', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+            ],
+            'Lunch': [
+              { id: '204', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '205', name: 'Masala Dal', portion: '1 bowl (150g)', calories: 200, protein: 10, carbs: 30, fat: 5 },
+              { id: '206', name: 'Chicken Dum Biryani', portion: '1 bowl (250g)', calories: 600, protein: 30, carbs: 70, fat: 20 },
+              { id: '207', name: 'Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '208', name: 'White Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '209', name: 'Veg Biryani', portion: '1 bowl (250g)', calories: 400, protein: 10, carbs: 60, fat: 12 },
+              { id: '210', name: 'Matar Paneer', portion: '1 bowl (150g)', calories: 300, protein: 15, carbs: 15, fat: 18 },
+              { id: '211', name: 'Onion Cucumber Raita', portion: '1 bowl (100g)', calories: 80, protein: 4, carbs: 8, fat: 4 },
+            ],
+            'Snacks': [
+              { id: '212', name: 'Pasta', portion: '1 bowl (150g)', calories: 260, protein: 8, carbs: 40, fat: 8 },
+              { id: '213', name: 'Dhokla', portion: '1 pc (50g)', calories: 150, protein: 5, carbs: 20, fat: 5 },
+              { id: '214', name: 'Sauce', portion: '1 sachet (10g)', calories: 20, protein: 0, carbs: 5, fat: 0 },
+              { id: '215', name: 'Tea', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '216', name: 'Coffee', portion: '1 cup (100ml)', calories: 35, protein: 1, carbs: 5, fat: 1 },
+              { id: '217', name: 'Milk', portion: '1 cup (100ml)', calories: 75, protein: 4, carbs: 6, fat: 4 },
+            ],
+            'Dinner': [
+              { id: '218', name: 'Roti', portion: '1 pc', calories: 90, protein: 3, carbs: 18, fat: 1 },
+              { id: '219', name: 'Plain Rice', portion: '1 cup (150g)', calories: 200, protein: 4, carbs: 45, fat: 1 },
+              { id: '220', name: 'Dum Aloo', portion: '1 bowl (150g)', calories: 250, protein: 5, carbs: 35, fat: 10 },
+              { id: '221', name: 'Masoor Dal', portion: '1 bowl (150g)', calories: 180, protein: 10, carbs: 25, fat: 4 },
+              { id: '222', name: 'Rasam', portion: '1 bowl (150ml)', calories: 60, protein: 3, carbs: 10, fat: 1 },
+              { id: '223', name: 'Pickle', portion: '1 tsp (10g)', calories: 20, protein: 0, carbs: 4, fat: 1 },
+              { id: '224', name: 'Gulab Jamun', portion: '1 pc (50g)', calories: 284, protein: 2, carbs: 54, fat: 7 },
+            ],
+          },
+        };
+
+        const mealIcons = {
+            'Breakfast': `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-300">
+                    <path d="M10 2c0 2.8-2.2 5-5 5H4c-1.1 0-2 .9-2 2v2c0 2.8 2.2 5 5 5h14c1.1 0 2-.9 2-2V9c0-2.8-2.2-5-5-5h-1a5 5 0 0 0-5 5v2"/>
+                    <path d="M8 15v5c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2v-5"/>
+                </svg>
+            `,
+            'Lunch': `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-300">
+                    <path d="M12 21a9 9 0 0 0-9-9h9v9Z"/>
+                    <path d="M21 12a9 9 0 0 0-9-9v9Z"/>
+                </svg>
+            `,
+            'Snacks': `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-300">
+                    <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8-3-15.44C13.5 2.5 10 2 10 6c0 3.93 3.19 5.8 5 8a4 4 0 0 1-4 4Z"/>
+                    <path d="M12 10.94c-1.5 0-2.75 1.06-4 1.06-3 0-6-8-3-15.44C6.5 2.5 10 2 10 6c0 3.93 3.19 5.8 5 8a4 4 0 0 1-4 4Z"/>
+                </svg>
+            `,
+            'Dinner': `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-300">
+                    <path d="M16 16v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2"/>
+                    <path d="M18 10c0-2.2-1.8-4-4-4H8c-2.2 0-4 1.8-4 4v6c0 2.2 1.8 4 4 4h8c2.2 0 4-1.8 4-4v-6Z"/>
+                    <path d="M16 6a2 2 0 0 1 2 2v2"/>
+                    <path d="M8 6a2 2 0 0 0-2 2v2"/>
+                </svg>
+            `,
+        };
+
+        const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const mealTypes = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
+
+
+        let selectedItems = {};
+
+
+        const weekdaySelector = document.getElementById('weekday-selector');
+        const mealSectionsContainer = document.getElementById('meal-sections-container');
+        const totalCaloriesEl = document.getElementById('total-calories');
+        const totalProteinEl = document.getElementById('total-protein');
+        const totalCarbsEl = document.getElementById('total-carbs');
+        const totalFatEl = document.getElementById('total-fat');
+        
+
+        let selectedDay = weekdays[new Date().getDay()];
+
+        
+        
+        function renderWeekdayButtons() {
+            weekdaySelector.innerHTML = '';
+            weekdays.forEach(day => {
+                const button = document.createElement('button');
+                button.textContent = day;
+                button.className = `weekday-btn px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 ease-in-out shadow-lg transform hover:scale-105
+                    ${selectedDay === day
+                        ? 'neon-border text-white bg-gradient-to-r from-indigo-500 to-purple-600'
+                        : 'glass-morphism text-white hover:bg-white hover:bg-opacity-20'
+                    }`;
+                button.addEventListener('click', () => {
+                    selectedDay = day;
+                    renderWeekdayButtons();
+                    renderMenu();
+                    updateTotals();
+                });
+                weekdaySelector.appendChild(button);
+            });
+        }
+
+        
+        
+        function renderMenu() {
+            mealSectionsContainer.innerHTML = '';
+            const dailyMenu = messMenu[selectedDay];
+
+            if (!dailyMenu) {
+                mealSectionsContainer.innerHTML = '<p class="text-center text-white text-xl">No menu available for this day.</p>';
+                return;
+            }
+
+            mealTypes.forEach((meal, index) => {
+                const itemsForMeal = dailyMenu[meal] || [];
+
+                if (itemsForMeal.length === 0) return;
+
+                const mealSection = document.createElement('div');
+                mealSection.className = 'meal-card rounded-3xl p-6 shadow-2xl slide-in-up';
+                mealSection.style.animationDelay = `${index * 0.1}s`;
+                mealSection.innerHTML = `
+                    <div class="flex items-center mb-6">
+                        <div class="bg-gradient-to-r from-white from-10% to-transparent p-3 rounded-2xl mr-4 shadow-lg">
+                            ${mealIcons[meal]}
+                        </div>
+                        <h2 class="text-3xl font-black text-white gradient-text">${meal}</h2>
+                        <div class="ml-auto">
+                            <span class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm font-semibold text-white">
+                                ${itemsForMeal.length} items
+                            </span>
+                        </div>
+                    </div>
+                    <div id="meal-${meal}-list" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Items will go here -->
+                    </div>
+                `;
+                mealSectionsContainer.appendChild(mealSection);
+
+                const mealList = document.getElementById(`meal-${meal}-list`);
+                itemsForMeal.forEach((item, itemIndex) => {
+                    const currentCount = selectedItems[selectedDay]?.[item.id] || 0;
+                    const isSelected = currentCount > 0;
+
+                    const itemEl = document.createElement('div');
+                    itemEl.className = `item-card flex items-center p-4 rounded-2xl transition-all duration-300 ease-in-out border-2 cursor-pointer
+                        ${isSelected ? 'selected-item' : 'glass-morphism border-white border-opacity-20 hover:border-opacity-40'}`;
+                    itemEl.style.animationDelay = `${(index * 0.1) + (itemIndex * 0.05)}s`;
+                    itemEl.innerHTML = `
+                        <div class="flex-grow">
+                            <p class="font-bold text-lg ${isSelected ? 'text-white' : 'text-white'} mb-1">
+                                ${item.name}
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                <span class="px-2 py-1 bg-red-500 bg-opacity-20 rounded-lg text-xs font-semibold text-red-200 border border-red-400 border-opacity-30">
+                                    🔥 ${item.calories} kcal
+                                </span>
+                                <span class="px-2 py-1 bg-green-500 bg-opacity-20 rounded-lg text-xs font-semibold text-green-200 border border-green-400 border-opacity-30">
+                                    💪 ${item.protein}g
+                                </span>
+                                <span class="px-2 py-1 bg-blue-500 bg-opacity-20 rounded-lg text-xs font-semibold text-blue-200 border border-blue-400 border-opacity-30">
+                                    ⚡ ${item.carbs}g
+                                </span>
+                                <span class="px-2 py-1 bg-yellow-500 bg-opacity-20 rounded-lg text-xs font-semibold text-yellow-200 border border-yellow-400 border-opacity-30">
+                                    🥑 ${item.fat}g
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-300 font-medium">
+                                📏 <strong>${item.portion}</strong>
+                            </p>
+                        </div>
+                        <div class="flex flex-col items-center ml-4">
+                            <button class="decrement-btn w-10 h-10 bg-red-500 hover:bg-red-400 text-white rounded-full font-bold text-lg transition-all duration-200 hover:scale-110 shadow-lg mb-2" data-item-id="${item.id}">
+                                −
+                            </button>
+                            <input
+                                type="number"
+                                value="${currentCount}"
+                                min="0"
+                                class="quantity-input w-16 px-2 py-2 text-center border-2 border-white border-opacity-30 rounded-xl text-white bg-white bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent font-bold backdrop-blur-sm"
+                                data-item-id="${item.id}"
+                            />
+                            <button class="increment-btn w-10 h-10 bg-green-500 hover:bg-green-400 text-white rounded-full font-bold text-lg transition-all duration-200 hover:scale-110 shadow-lg mt-2" data-item-id="${item.id}">
+                                +
+                            </button>
+                        </div>
+                    `;
+                    
+                    const input = itemEl.querySelector('.quantity-input');
+                    const incrementBtn = itemEl.querySelector('.increment-btn');
+                    const decrementBtn = itemEl.querySelector('.decrement-btn');
+                    
+                    input.addEventListener('change', (event) => {
+                        handleItemCountChange(item.id, parseInt(event.target.value) || 0, itemEl);
+                    });
+                    
+                    incrementBtn.addEventListener('click', () => {
+                    const currentValue = parseInt(input.value) || 0;  
+                    const newCount = currentValue + 1;
+                    input.value = newCount;
+                    handleItemCountChange(item.id, newCount, itemEl);
+                });
+
+                decrementBtn.addEventListener('click', () => {
+                    const currentValue = parseInt(input.value) || 0;  
+                    const newCount = Math.max(0, currentValue - 1);
+                    input.value = newCount;
+                    handleItemCountChange(item.id, newCount, itemEl);
+                });
+                    
+                    mealList.appendChild(itemEl);
+                });
+            });
+        }
+
+       
+        function handleItemCountChange(itemId, count, itemEl) {
+            if (!selectedItems[selectedDay]) {
+                selectedItems[selectedDay] = {};
+            }
+            selectedItems[selectedDay][itemId] = count;
+
+            const isSelected = count > 0;
+            const input = itemEl.querySelector('.quantity-input');
+
+            if (isSelected) {
+                itemEl.classList.remove('glass-morphism', 'border-white', 'border-opacity-20', 'hover:border-opacity-40');
+                itemEl.classList.add('selected-item');
+                input.value = count;
+            } else {
+                itemEl.classList.remove('selected-item');
+                itemEl.classList.add('glass-morphism', 'border-white', 'border-opacity-20', 'hover:border-opacity-40');
+                input.value = 0;
+            }
+
+            updateTotals();
+        }
+
+       
+        function updateTotals() {
+            let totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+            const dailySelections = selectedItems[selectedDay] || {};
+
+            mealTypes.forEach(meal => {
+                const itemsForMeal = messMenu[selectedDay]?.[meal] || [];
+                itemsForMeal.forEach(item => {
+                    const count = dailySelections[item.id] || 0;
+                    totals.calories += item.calories * count;
+                    totals.protein += item.protein * count;
+                    totals.carbs += item.carbs * count;
+                    totals.fat += item.fat * count;
+                });
+            });
+
+            animateValue(totalCaloriesEl, parseInt(totalCaloriesEl.textContent) || 0, totals.calories, 500);
+            animateValue(totalProteinEl, parseInt(totalProteinEl.textContent.replace('g', '')) || 0, totals.protein, 500, 'g');
+            animateValue(totalCarbsEl, parseInt(totalCarbsEl.textContent.replace('g', '')) || 0, totals.carbs, 500, 'g');
+            animateValue(totalFatEl, parseInt(totalFatEl.textContent.replace('g', '')) || 0, totals.fat, 500, 'g');
+        }
+
+        
+        function animateValue(element, start, end, duration, suffix = '') {
+            const range = end - start;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const current = Math.round(start + (range * easeOutQuart));
+                element.textContent = current + suffix;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWeekdayButtons();
+            renderMenu();
+            updateTotals();
+            
+            setInterval(() => {
+                createSparkle();
+            }, 2000);
+        });
+
+        
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'fixed pointer-events-none z-50';
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = Math.random() * window.innerHeight + 'px';
+            sparkle.innerHTML = '✨';
+            sparkle.style.fontSize = Math.random() * 20 + 10 + 'px';
+            sparkle.style.animation = 'sparkle 3s ease-out forwards';
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 3000);
+        }
+
+       
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes sparkle {
+                0% { opacity: 0; transform: translateY(0) scale(0); }
+                50% { opacity: 1; transform: translateY(-100px) scale(1); }
+                100% { opacity: 0; transform: translateY(-200px) scale(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
